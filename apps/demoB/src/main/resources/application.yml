@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: demoA
+  zipkin:
+    enabled: false
+
+management:
+  security:
+    enabled: false
