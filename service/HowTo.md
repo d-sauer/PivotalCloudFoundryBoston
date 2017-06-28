@@ -55,3 +55,25 @@ BOSH CLI install
  
  
 9. Add which files to include in the package (*packages/activemq_pkg/spec*)
+
+
+    ---
+    name: activemq_pkg
+    
+    dependencies: []
+    
+    files:
+      - activemq.tar.gz
+      
+      
+10. Create BOSH deployment manifest _service/activemq-service/manifest/activemq.yml_
+
+11. Create BOSH release `bosh create-release --force --tarball=activemq-release`
+
+12. Copy release to the server `scp -i ../../../PCFBostonWorkshop/pie-27.pem activemq-release ubuntu@opsman.pie-27.cfplatformeng.com:~/activemq/`
+
+13. Copy manifest (_activemq.yml_) to the server `scp -i ../../../PCFBostonWorkshop/pie-27.pem manifest/activemq.yml ubuntu@opsman.pie-27.cfplatformeng.com:~/activemq/`
+
+14. BOSH deployment: `bosh deployment <copied manifest file..acivemq.yml>`
+
+15. BOSH deploy `bosh deploy`
