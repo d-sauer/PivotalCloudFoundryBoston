@@ -1,0 +1,13 @@
+---
+applications:
+- name: demoA
+  memory: 800M
+  random-route: true
+  path: build/libs/demo-a.jar
+  buildpack: https://github.com/cloudfoundry/java-buildpack.git
+env:
+ JBP_CONFIG_DEBUG: '{enabled: true}'
+# SIG_SECRET_KEY: JWTSecretKeyDontUseInProduction!
+#services:
+# - registry-service
+# - my-rabbit

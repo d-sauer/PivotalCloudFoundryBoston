@@ -1,8 +1,9 @@
-package com.example.demoA.controller;
+package com.example.demoB.controller;
+
+import com.example.commons.InfoBean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -14,16 +15,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-public class Index {
+public class IndexB {
 
-    private static final Logger logger = LoggerFactory.getLogger(Index.class);
+    private static final Logger logger = LoggerFactory.getLogger(IndexB.class);
+
+    private InfoBean infoBean;
 
     private RestTemplate restTemplate;
 
-    @Value("${spring.application.name}")
-    private String appName;
-
-    public Index(RestTemplate restTemplate) {
+    public IndexB(InfoBean infoBean, RestTemplate restTemplate) {
+        this.infoBean = infoBean;
         this.restTemplate = restTemplate;
     }
 
@@ -31,12 +32,7 @@ public class Index {
     Map<String, Object> index() {
         logger.info("GET index");
 
-        Map<String, Object> data = new HashMap<>();
-
-        data.put("appName", appName);
-        data.put("time", LocalDateTime.now().toString());
-
-        return data;
+        return infoBean.info();
     }
 
 

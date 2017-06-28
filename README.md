@@ -1,4 +1,4 @@
-# PCF Boston notes
+# PCF Playground
 
 ## Local Dev setup
 
@@ -44,6 +44,11 @@ https://docs.pivotal.io/pcf-dev/work-offline.html
         
 5. Add _127.0.0.1_ as first DNS server
 
+
+### Tooling
+
+ - [Maven/Gradle PCF plugin](https://content.pivotal.io/blog/improved-java-tooling-for-cloud-foundry)
+ 
 
 # Tiles
 

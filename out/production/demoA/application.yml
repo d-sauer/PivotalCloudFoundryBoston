@@ -6,13 +6,8 @@ spring:
 
 management:
   security:
-    enabled: true
+    enabled: false
 
 demo:
   listenerQueueName: demo-b-queue
   destinationName: demo-a-queue
-
-logging:
-  level:
-    com:
-      example: TRACE

@@ -1,3 +1,21 @@
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "io.franzbecker:gradle-lombok:1.8"
+    }
+}
+
+apply plugin: 'eclipse-wtp'
+apply plugin: 'idea'
+
+subprojects {
+    apply plugin: "io.franzbecker.gradle-lombok"
+}
+
 task wrapper(type: Wrapper) {
     gradleVersion = '4.0'
 }
