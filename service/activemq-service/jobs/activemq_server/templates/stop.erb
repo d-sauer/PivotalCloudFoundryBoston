@@ -2,6 +2,8 @@
 LOG_DIR=/var/vcap/sys/log/activemq_server
 DATA_DIR=/var/vcap/jobs/activemq_server/data
 BASE_DIR=/var/vcap/packages/activemq_pkg
-BINARY_DIR=$BASE_DIR/bin
+BINARY_DIR=$BASE_DIR/bin/linux-x86-64
 PIDFILE=$DATA_DIR/activemq.pid
+sudo -u vcap $BINARY_DIR/activemq stop
+sleep 30
 killall activemq
