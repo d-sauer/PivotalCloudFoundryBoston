@@ -9,11 +9,35 @@ BOSH CLI install
   
 ## Create service
 
-1. Enter service release folder (e.g. service/activemq-service)
+1. Enter service release folder (**root**, e.g. service/activemq-service)
 
 2. Initialize the release `bosh init-release`
 
+
+    activemq-service
+      (root)
+        ├── config
+        │   ├── blobs.yml
+        │   └── final.yml
+        ├── jobs
+        ├── packages
+        └── src
+    
 > Best Practice: <br/>
    Use - (dash) in the release name, <br/>
    and _ (underscores) in all the files in the release
    
+3. Generate job for ActiveMq server `bosh generate-job activemq_server`
+
+
+    .
+    ├── config
+    │   ├── blobs.yml
+    │   └── final.yml
+    ├── jobs
+    │   └── activemq_server
+    │       ├── monit
+    │       ├── spec
+    │       └── templates
+    ├── packages
+    └── src
