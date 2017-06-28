@@ -54,10 +54,5 @@ https://docs.pivotal.io/pcf-dev/work-offline.html
 
 http://docs.pivotal.io/tiledev/tile-generator.html
 
-Tile Generator installation: http://docs.pivotal.io/tiledev/tile-generator.html#how-to
-
-BOSH CLI install
-  - https://bosh.io/docs/cli-v2.html
-  - https://github.com/cloudfoundry/homebrew-tap
-  
+Tile Generator installation: http://docs.pivotal.io/tiledev/tile-generator.html#how-to  
   
