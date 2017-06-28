@@ -1,0 +1,5 @@
+check process activemq
+  with pidfile /var/vcap/jobs/activemq_server/data/activemq.pid
+  start program "/var/vcap/jobs/activemq_server/bin/start" with timeout 600 seconds
+  stop program "/var/vcap/jobs/activemq_server/bin/stop"
+  group vcap

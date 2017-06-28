@@ -1,8 +1,11 @@
 ---
 name: activemq_server
 
-templates: {}
+templates:
+  start.erb: bin/start
+  stop.erb: bin/stop
 
-packages: []
+packages:
+- activemq_pkg
 
 properties: {}

@@ -1,0 +1,7 @@
+#!/bin/bash -e
+LOG_DIR=/var/vcap/sys/log/activemq_server
+DATA_DIR=/var/vcap/jobs/activemq_server/data
+BASE_DIR=/var/vcap/packages/activemq_pkg
+BINARY_DIR=$BASE_DIR/bin
+PIDFILE=$DATA_DIR/activemq.pid
+killall activemq

@@ -41,3 +41,10 @@ BOSH CLI install
     │       └── templates
     ├── packages
     └── src
+    
+    
+4. Create start (`start.erb`) script for the ActiveMq server in _service/activemq-service/jobs/activemq_server/templates_
+5. Create start (`stop.erb`) script for the ActiveMq server in _service/activemq-service/jobs/activemq_server/templates_
+5. Fill in monitoring (`monit`) script _service/activemq-service/jobs/activemq_server/monit_
+6. Fill in specification (`spec`) script _service/activemq-service/jobs/activemq_server/spec_
+  
