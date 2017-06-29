@@ -2,6 +2,7 @@ package com.example.commons;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.context.annotation.Bean;
@@ -13,8 +14,8 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 @Configuration
-@ConditionalOnMissingBean(value = WebSecurityConfigurerAdapter.class)
 @EnableWebSecurity
+@ConditionalOnMissingBean(value = WebSecurityConfigurerAdapter.class)
 public class CommonSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private static final Logger logger = LoggerFactory.getLogger(CommonSecurityConfig.class);
