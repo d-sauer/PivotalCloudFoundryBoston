@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestOperations;
 
 import java.net.URI;
-import java.util.List;
+import java.net.URISyntaxException;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -45,8 +45,14 @@ public class RouteController {
     }
 
     @RequestMapping(headers = {FORWARDED_URL, PROXY_METADATA, PROXY_SIGNATURE})
-    ResponseEntity<?> route(RequestEntity<byte[]> incoming) {
+    ResponseEntity<?> route(RequestEntity<byte[]> incoming) throws URISyntaxException {
         this.logger.info("Incoming Request: {}", incoming);
+
+        HttpHeaders incomingHeaders = incoming.getHeaders();
+        logger.info("X-CF-Forwarded-Url: {}", incomingHeaders.get(FORWARDED_URL).toArray());
+        logger.info("X-CF-Proxy-Metadata: {}", incomingHeaders.get(PROXY_METADATA).toArray());
+        logger.info("X-CF-Proxy-Signature: {}", incomingHeaders.get(PROXY_SIGNATURE).toArray());
+
 
         RequestEntity<?> outgoing = getOutgoingRequest(incoming);
         this.logger.info("Outgoing Request: {}", outgoing);
@@ -54,14 +60,23 @@ public class RouteController {
         return this.restOperations.exchange(outgoing, byte[].class);
     }
 
-    private RequestEntity<?> getOutgoingRequest(RequestEntity<?> incoming) {
+    private RequestEntity<?> getOutgoingRequest(RequestEntity<?> incoming) throws URISyntaxException {
         HttpHeaders headers = new HttpHeaders();
         headers.putAll(incoming.getHeaders());
 
-        URI uri = headers.remove(FORWARDED_URL).stream()
+//        headers.remove(PROXY_SIGNATURE);
+//        headers.remove(PROXY_METADATA);
+
+//        URI uri = redirect(headers.get(FORWARDED_URL).get(0));
+//        URI uri = new URI(headers.get(FORWARDED_URL).get(0));
+        URI uri = headers
+                .remove(FORWARDED_URL)
+                .stream()
                 .findFirst()
                 .map(this::redirect)
                 .orElseThrow(() -> new IllegalStateException(String.format("No %s header present", FORWARDED_URL)));
+
+        logger.info("Outgoing Request URI: {}", uri);
 
         return new RequestEntity<>(incoming.getBody(), headers, incoming.getMethod(), uri);
     }
@@ -73,7 +88,7 @@ public class RouteController {
         if (!Objects.equals(forwardUri, redirectUrl)) {
             logger.info("Redirect URI from: '{}' to '{}'", forwardUri, redirectUrl);
         } else {
-            logger.info("Forward URI: {}", forwardUri);
+            logger.info("Pass by URI: {}", forwardUri);
         }
 
         return URI.create(redirectUrl);

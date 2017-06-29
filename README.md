@@ -56,3 +56,9 @@ http://docs.pivotal.io/tiledev/tile-generator.html
 
 Tile Generator installation: http://docs.pivotal.io/tiledev/tile-generator.html#how-to  
   
+
+# Debug
+
+For debugging we need to open SSH tunnel (5005 - port on localhost machine to connect remote debugger, Debug 8000 port on PCF):
+
+    cf ssh -N -T -L 5005:localhost:8000 <APP_NAME>
