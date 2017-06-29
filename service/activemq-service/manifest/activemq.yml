@@ -3,7 +3,7 @@ name: activemq
 director_uuid: d43a09bc-1291-497d-a04d-1b66d883a9b8
 
 releases:
-  - {name: activemq, version: latest}
+  - {name: activemq-service, version: latest}
 stemcells:
   - alias: bosh-google-kvm-ubuntu-trusty-go_agent
     os: ubuntu-trusty
@@ -13,21 +13,21 @@ update:
   max_in_flight: 10
   canary_watch_time: 1000-30000
   update_watch_time: 1000-30000
-  instance_groups:
-    - name: activemq_server_node
-      instances: 1
-      # {use the az name}
-      azs: [us-central1-a]
-      jobs:
-          # Name of the Job from the service/activemq-service/jobs
-        - name: activemq_server
-          release: activemq
-      vm_type: xlarge.disk
-      cloud_properties:
-        tags:
-            - allow-ssh
-      stemcell: bosh-google-kvm-ubuntu-trusty-go_agent
-      persistent_disk_type: '307200'
-      networks:
-      # {use the services network name}
-        - name: services-1
+instance_groups:
+  - name: activemq_server_node
+    azs: [us-central1-a]
+    instances: 1
+    # {use the az name}
+    jobs:
+        # Name of the Job from the service/activemq-service/jobs
+      - name: activemq_server
+        release: activemq-service
+    vm_type: xlarge.disk
+    cloud_properties:
+      tags:
+          - allow-ssh
+    stemcell: bosh-google-kvm-ubuntu-trusty-go_agent
+    persistent_disk_type: '307200'
+    networks:
+    # {use the services network name}
+      - name: services-1

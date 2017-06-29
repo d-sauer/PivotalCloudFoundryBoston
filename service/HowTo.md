@@ -77,3 +77,12 @@ BOSH CLI install
 14. BOSH deployment: `bosh deployment <copied manifest file..acivemq.yml>`
 
 15. BOSH deploy `bosh deploy`
+
+
+Useful BOSH commands
+ - bosh upload release activemq-release
+ - bosh deployments
+ - bosh deployment manifest.yml
+ - bosh deploy
+ - bosh ssh
+ 

@@ -1,0 +1,679 @@
+name: p-redis-9f9daa24c03e8745be6f
+director_uuid: d43a09bc-1291-497d-a04d-1b66d883a9b8
+releases:
+- name: cf-redis
+  version: 428.4.0
+- name: redis-metrics
+  version: 3.4.0
+- name: service-metrics
+  version: 1.5.5
+- name: loggregator
+  version: '65'
+- name: consul
+  version: '152'
+- name: routing
+  version: 0.143.0
+- name: redis-backups
+  version: 0.13.0
+- name: service-backup
+  version: 18.0.3
+stemcells:
+- alias: bosh-google-kvm-ubuntu-trusty-go_agent
+  os: ubuntu-trusty
+  version: '3263.21'
+instance_groups:
+- name: cf-redis-broker
+  azs:
+  - us-central1-a
+  instances: 1
+  lifecycle: service
+  jobs:
+  - name: cf-redis-broker
+    release: cf-redis
+    consumes: {}
+    provides: {}
+  - name: syslog-configurator
+    release: cf-redis
+    consumes: {}
+    provides: {}
+  - name: redis-broker-metrics
+    release: redis-metrics
+    consumes: {}
+    provides: {}
+  - name: service-metrics
+    release: service-metrics
+    consumes: {}
+    provides: {}
+  - name: metron_agent
+    release: loggregator
+    consumes: {}
+    provides: {}
+  - name: route_registrar
+    release: routing
+    consumes: {}
+    provides: {}
+  - name: redis-backups
+    release: redis-backups
+    consumes: {}
+    provides: {}
+  - name: service-backup
+    release: service-backup
+    consumes: {}
+    provides: {}
+  - name: consul_agent
+    release: consul
+    consumes: {}
+    provides: {}
+  vm_type: medium
+  stemcell: bosh-google-kvm-ubuntu-trusty-go_agent
+  properties:
+    route_registrar:
+      routes:
+      - health_check:
+          name: redis-broker
+          script_path: "/var/vcap/jobs/cf-redis-broker/bin/health_check.sh"
+        name: broker_0
+        port: 12350
+        registration_interval: 10s
+        tags:
+          component: redis-broker
+          env: production
+        uris:
+        - redis-broker.sys.pie-27.cfplatformeng.com
+    cf:
+      apps_domain: cfapps.pie-27.cfplatformeng.com
+      system_domain: sys.pie-27.cfplatformeng.com
+    nats:
+      machines:
+      - 192.168.16.11
+      port: 4222
+      user: nats
+      password: GkP61HJKPi0kWX1ub26ZmWZ-o2VzX2sK
+    redis:
+      host: 192.168.16.60
+      config_command: Arr1FJ6seB-Hdd4PUGNB8KmkvXwz6gsI
+      save_command: lhIxeMjmd3zR41Vv37L7Vi_-7edYetnE
+      bg_save_command: xSlyorFtOcQzgouCvYs72EQnRMGjC_Gg
+      broker:
+        name: p-redis-9f9daa24c03e8745be6f
+        network: default
+        backend_host: 192.168.16.60
+        dedicated_nodes:
+        - 192.168.16.61
+        - 192.168.16.62
+        - 192.168.16.63
+        - 192.168.16.64
+        - 192.168.16.65
+        host: 192.168.16.60
+        service_instance_limit: 5
+        auth:
+          username: admin
+          password: DGTOPBLoUs8AH52ECDl3Jcd035o_qos3
+      maxmemory: 512MB
+    syslog_aggregator:
+      address:
+      port:
+      transport: TCP
+    service_metrics:
+      origin: p-redis
+      execution_interval_seconds: 30
+      deployment: cf-redis
+      dropsonde_incoming_port: 3457
+      metrics_command: "/var/vcap/packages/redis-broker-metrics/bin/redis-broker-metrics"
+      metrics_command_args:
+      - "-config=/var/vcap/jobs/cf-redis-broker/config/broker.yml"
+      monit_dependencies:
+      - cf-redis-broker
+    metron_agent:
+      deployment: cf-redis
+      etcd:
+        client_cert: |
+          -----BEGIN CERTIFICATE-----
+          MIIDWzCCAkOgAwIBAgIUe502gk2FjIZvl+6Auat4YcWEWtUwDQYJKoZIhvcNAQEL
+          BQAwHzELMAkGA1UEBhMCVVMxEDAOBgNVBAoMB1Bpdm90YWwwHhcNMTcwNDEyMTcy
+          NjA3WhcNMTkwNDEyMTcyNjA3WjA9MQswCQYDVQQGEwJVUzEQMA4GA1UECgwHUGl2
+          b3RhbDEcMBoGA1UEAwwTY2ZfZXRjZF9jbGllbnRfY2VydDCCASIwDQYJKoZIhvcN
+          AQEBBQADggEPADCCAQoCggEBANzYpRPGpxhmawcRBCeDfu5bbck4sy/8xFB7NZQJ
+          Or9fsFRMYWTvZEfdv/uhXzrzp0XkdKYoExzZvUlE0KDONp4qL4XUyd+SUeWKpZbJ
+          xGuWJ2LXWhB9ajAS4PUQ9B+gFp9yB05e47Rje+GpfWClt3j4pRWzAszTJit0mghd
+          Kx9wAonwOwEZj2wLjct81r0yJQ/A14pnYqq+4rlHbqvocx6UIMfhjsrnupiySpBN
+          6VwlW3+kJ5/4au31mve00/d5mTZQE055HNLiPFLhph461K5V3sXv69XBJjvM491L
+          0K19YbSDX0EnGzjIVyvsxUAd+YRt7RNShXg9o28gHeupMe0CAwEAAaNxMG8wDgYD
+          VR0PAQH/BAQDAgeAMB0GA1UdDgQWBBS6t0wlc72/5Mee7qMTPOvvG7CpGDAdBgNV
+          HSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwEwHwYDVR0jBBgwFoAUkPQxqmwtp0Z5
+          seEqZEapgXTh534wDQYJKoZIhvcNAQELBQADggEBALAmkg3LkfSKjf0ynhC2EfXk
+          u3GRXmTwrv2zkLTB+IWRMFqkldyP7ykHpcbq7MMNiLVX6sfDgNoOhwnV6Sp9ERsG
+          9REE4Lqir2NNyp7vD7NCBKu1rk2xNRjWOQFwlaz+uCrbEZBiuxMkEDPHjgopXhCf
+          zpStnIY7FKdWN8wQcnsTgZ0ZMxCScGRjH7Sn3+yso658E7uHQ/P3U3JJEsjdA7n1
+          jsJFsPwUqZNfZDw9jLOK6Mu8Pzl9cwHyuSfkA/w5GvNbx3GOh9vWj1L9Oes+JpVC
+          6QxsDDTqU66UYLDRbaXIRl9MLnXUaud7Fjycii1UQNeKRhVdXLzmWnoqy3aEK/c=
+          -----END CERTIFICATE-----
+        client_key: |
+          -----BEGIN RSA PRIVATE KEY-----
+          MIIEpQIBAAKCAQEA3NilE8anGGZrBxEEJ4N+7lttyTizL/zEUHs1lAk6v1+wVExh
+          ZO9kR92/+6FfOvOnReR0pigTHNm9SUTQoM42niovhdTJ35JR5YqllsnEa5YnYtda
+          EH1qMBLg9RD0H6AWn3IHTl7jtGN74al9YKW3ePilFbMCzNMmK3SaCF0rH3ACifA7
+          ARmPbAuNy3zWvTIlD8DXimdiqr7iuUduq+hzHpQgx+GOyue6mLJKkE3pXCVbf6Qn
+          n/hq7fWa97TT93mZNlATTnkc0uI8UuGmHjrUrlXexe/r1cEmO8zj3UvQrX1htINf
+          QScbOMhXK+zFQB35hG3tE1KFeD2jbyAd66kx7QIDAQABAoIBAQC2uiYz66z72ln5
+          2dF3JCzU6R84W8qfDOQdtyQInW5XQ8Qwq5X2HsD5WXfsqoOR0mH3yWPeys+tklc0
+          lVSNiLHWQg9aC0sQyg8q/oGt9rmnTvC9rnNdq3c92ZD6FBH5TMsLGB0FciuzaJDq
+          kQMlAViCJjDpeFj7wkUVtX9xJi107v0mUiJfc79YsxGbt3Q4mlc9wZ3pxMN7LMXv
+          OcXo0hxHdUL9/pi5hB8FYi1XhytvwY1BC4DO+8iZYqDOdXNDwEUY12ZxGsUZmfIJ
+          d2IS+wcYHjUZspvl+JOpGO63LHglFiZboCsN/Fbv41kZbHllzF9HkZKrPG44oroS
+          3ybkYtb9AoGBAP8tuH/LDU/HWTJgmtTmVCfH1eaSFODeNTMSaKkt1HQHQxNTI53w
+          Pd8HQq3ZHp8Uzsxgt2bvtHkSJFFhcLq+yNmrSFVloejA61mhUFm3XhnWOXXFctld
+          EqhAfwUBWzffhKFAHmv7rzsOEr7hBGz1RBze2rFVfzvmhFbisM4vbrLXAoGBAN2O
+          ofYmogtcMEVzjh5pNU00Fc9mwR2kS1M0L/a5yQ717APLpjuip0lxo35I8gGQqnPS
+          HTl/l9Xd3FV2+6VELJxk6im6GKj57Ku71EYRsshlzsfUazM5NF+7B1uHJgdI0AHA
+          uhFlUcgd23U69QWVKp2MyktIvz++j2CWMTPCqOzbAoGBANwgvdMH//C9YFXT/l0A
+          YMJ8YipoBDjDl5L6I20mCusYxKUsCEKb11PJOJ0t+ntzAL5QBIZ46++xVcEaVJvU
+          LwGO/3Qjm1tk6OHGBcGPLE8PfTv6W4vk/U5FbQ2NUPpPCGPuIxA16sD/7+3XwPCZ
+          V+ur1244+exbe/hTz//d7Rm7AoGADGZzQiefYitiuEBjb+hLh2qm3djObi5H2PxO
+          wuxbCG9TKlM3lpbf7ghiMis7AENshtb3s8QkZ1/neRETvIg4RviO8o7r2mlCicoV
+          c2aCLx0jmaOV7GQDPmhlXQYPZtD4c2CqCVc2YJDrO4B1Pj6/B9pdaCFGMvcjZzCA
+          yHjYo4kCgYEA6ezqGuN9LPgm+9INSnJxkR/yIxtISr3vXMW16rDMu1WWwfC18xaG
+          F75yalPTzoINgmtcOhhsfTryjp0G88FMSq+r6EOh7045qtRuKHZ3fdEuUy3AmFyy
+          +oSAa9GDqHEdSM68lN/e5eMiFy3xL7gqUbU4gnWHOOw9Bq+mgnb+F5o=
+          -----END RSA PRIVATE KEY-----
+    metron_endpoint:
+      shared_secret: mClA9S7AbLs6PxO-Aso5PHZcRQhoUuLP
+    loggregator:
+      etcd:
+        require_ssl: true
+        machines:
+        - cf-etcd.service.cf.internal
+        ca_cert: |
+          -----BEGIN CERTIFICATE-----
+          MIIDDjCCAfagAwIBAgIUFveV2Bc8af/2F8+9j/Gmf0A9N0swDQYJKoZIhvcNAQEL
+          BQAwHzELMAkGA1UEBhMCVVMxEDAOBgNVBAoMB1Bpdm90YWwwHhcNMTcwNDEyMTUz
+          MjIwWhcNMjEwNDEzMTUzMjIwWjAfMQswCQYDVQQGEwJVUzEQMA4GA1UECgwHUGl2
+          b3RhbDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALSt5KH6GkWhgfl6
+          gaDgEkmMOSsgXphVGFZh8ueFmDw93fsm+d+1VXTALfoDj5na8jhS6aV3AmEOEWyQ
+          wMHLyA4tniu16zY+nS4do+K3cNAwqVNnJwXBy9Cl8jR7fxq+pE8QFMjBw10V8DCz
+          7niEPjb+pOw+0rYtkRQ7YqZxu7RgrdK2x/LqpwPakQEZyhDXRQqrDyZYAUsbH5o4
+          cBUcq4ChQPDzKoywk3/obMOLuskzprLAHcAyLW4DPMXVRs3DgutWwYzFKNx8caOT
+          WB6FRaik0Ja2jTN6qIpxglEEpRcOjJaw+2cGGQj6zgQHCOPMMO6bSdPrRqLdEoVf
+          i1ed9vUCAwEAAaNCMEAwHQYDVR0OBBYEFJD0MapsLadGebHhKmRGqYF04ed+MA8G
+          A1UdEwEB/wQFMAMBAf8wDgYDVR0PAQH/BAQDAgEGMA0GCSqGSIb3DQEBCwUAA4IB
+          AQCHcTxgyHM6TMj9JYdmh38tpog0MJQ9LFhMBRuOLmvlkuC8lWW/NZRicuZ6ls1f
+          GKmn4GSxPCHEi0seku0NfFTr7JtC6I0BAo5+ZhLJJLmN8hlJLcTQxj1Yi+5nw8iD
+          UWz4EEuwT53XpP09mI72447xpQx7u7qyVYyu3MwR0ZxJg9cWxqE+AdZ88DQzPKnn
+          vMOYJcqXz0pYcSG38jIKpHbqQqDxIMXf37A9F1YDTD5IFxMtxUE2PY0faT2108Jp
+          8m4yZ15OGhj/bEUePORu0Kbs9oHX7d5MTo12CAIae/pi2Aozzxw8TBtxbrsiynIT
+          XnkzImlsdqbfr89AtGwFQudW
+          -----END CERTIFICATE-----
+    consul:
+      encrypt_keys:
+      - gpr-Z0VRkXt5OyE31t0rRRYZ0_F09aK8
+      ca_cert: |
+        -----BEGIN CERTIFICATE-----
+        MIIDDjCCAfagAwIBAgIUFveV2Bc8af/2F8+9j/Gmf0A9N0swDQYJKoZIhvcNAQEL
+        BQAwHzELMAkGA1UEBhMCVVMxEDAOBgNVBAoMB1Bpdm90YWwwHhcNMTcwNDEyMTUz
+        MjIwWhcNMjEwNDEzMTUzMjIwWjAfMQswCQYDVQQGEwJVUzEQMA4GA1UECgwHUGl2
+        b3RhbDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALSt5KH6GkWhgfl6
+        gaDgEkmMOSsgXphVGFZh8ueFmDw93fsm+d+1VXTALfoDj5na8jhS6aV3AmEOEWyQ
+        wMHLyA4tniu16zY+nS4do+K3cNAwqVNnJwXBy9Cl8jR7fxq+pE8QFMjBw10V8DCz
+        7niEPjb+pOw+0rYtkRQ7YqZxu7RgrdK2x/LqpwPakQEZyhDXRQqrDyZYAUsbH5o4
+        cBUcq4ChQPDzKoywk3/obMOLuskzprLAHcAyLW4DPMXVRs3DgutWwYzFKNx8caOT
+        WB6FRaik0Ja2jTN6qIpxglEEpRcOjJaw+2cGGQj6zgQHCOPMMO6bSdPrRqLdEoVf
+        i1ed9vUCAwEAAaNCMEAwHQYDVR0OBBYEFJD0MapsLadGebHhKmRGqYF04ed+MA8G
+        A1UdEwEB/wQFMAMBAf8wDgYDVR0PAQH/BAQDAgEGMA0GCSqGSIb3DQEBCwUAA4IB
+        AQCHcTxgyHM6TMj9JYdmh38tpog0MJQ9LFhMBRuOLmvlkuC8lWW/NZRicuZ6ls1f
+        GKmn4GSxPCHEi0seku0NfFTr7JtC6I0BAo5+ZhLJJLmN8hlJLcTQxj1Yi+5nw8iD
+        UWz4EEuwT53XpP09mI72447xpQx7u7qyVYyu3MwR0ZxJg9cWxqE+AdZ88DQzPKnn
+        vMOYJcqXz0pYcSG38jIKpHbqQqDxIMXf37A9F1YDTD5IFxMtxUE2PY0faT2108Jp
+        8m4yZ15OGhj/bEUePORu0Kbs9oHX7d5MTo12CAIae/pi2Aozzxw8TBtxbrsiynIT
+        XnkzImlsdqbfr89AtGwFQudW
+        -----END CERTIFICATE-----
+      agent_cert: |
+        -----BEGIN CERTIFICATE-----
+        MIIDWTCCAkGgAwIBAgIUcx77L8ePtL1rtA7Iss5ItAgStkkwDQYJKoZIhvcNAQEL
+        BQAwHzELMAkGA1UEBhMCVVMxEDAOBgNVBAoMB1Bpdm90YWwwHhcNMTcwNDEyMTcy
+        NjA2WhcNMTkwNDEyMTcyNjA2WjA7MQswCQYDVQQGEwJVUzEQMA4GA1UECgwHUGl2
+        b3RhbDEaMBgGA1UEAwwRY29uc3VsX2FnZW50X2NlcnQwggEiMA0GCSqGSIb3DQEB
+        AQUAA4IBDwAwggEKAoIBAQCufWFDGHOwVCUzqkGUBbBJAUm8GI8oNvlJXTwK7IaZ
+        00RA9z0WbfNjaLZh/TBSW9xo6J8wMzXmBFo55GHlb2Yw1jeVaTWictPCOx014Lg9
+        uT67aqiTkBPTNTceapy3Ptach7Q2eBnoV+GIdmxMnEaIa7k2Rc5Pl5VkWgHfgykq
+        J6LGSmGeZjb1/PEvHoKSuKLDBHpoZn3GQC+r+UCW/Vkwi7FS/JMxligDXZLEgC5m
+        5N9bbb55kUNbVYe+3UP06yHUqpCcsDKTkg5TbzNsph21lR+np2bnksibKrHdbjce
+        14K2mYQX1POMymThBU9vhGzoaKrV/SeRl0OFi05bAO2/AgMBAAGjcTBvMA4GA1Ud
+        DwEB/wQEAwIHgDAdBgNVHQ4EFgQUfGKoOdeTfa7fn3F/eE3WBAJJu5QwHQYDVR0l
+        BBYwFAYIKwYBBQUHAwIGCCsGAQUFBwMBMB8GA1UdIwQYMBaAFJD0MapsLadGebHh
+        KmRGqYF04ed+MA0GCSqGSIb3DQEBCwUAA4IBAQCbw4SIlMdgKq6r1W1fnsOHGccd
+        c7nSmub61quIP6CTYw3U+vindogQ6t+W7O+cJYRFlVx+izlAmqOQd6YqjBxaCcgw
+        vZvghD34LDcedHF51S64dby364jO6ArqzDwxhrB92nMPzdvVx1UqZJ5h4M7PRego
+        6w39LeSujeTSrIThAYEPcANEBBmU9Orr2AvIPZ27DxUaKdgmTcvOd0NrtYO6G9pm
+        Y2VsshLN3dIo41T4Gdcb6ANzrcmtLypVvb9Wio5HgcXa9wUVhb5zTj1JU+MbjG5C
+        fmOasDIpTgTxgbmFfqDsbGYT28DefmVuuBz4S7Nv8LstobSMXcBnkl0mhlet
+        -----END CERTIFICATE-----
+      agent_key: |
+        -----BEGIN RSA PRIVATE KEY-----
+        MIIEpQIBAAKCAQEArn1hQxhzsFQlM6pBlAWwSQFJvBiPKDb5SV08CuyGmdNEQPc9
+        Fm3zY2i2Yf0wUlvcaOifMDM15gRaOeRh5W9mMNY3lWk1onLTwjsdNeC4Pbk+u2qo
+        k5AT0zU3Hmqctz7WnIe0NngZ6FfhiHZsTJxGiGu5NkXOT5eVZFoB34MpKieixkph
+        nmY29fzxLx6CkriiwwR6aGZ9xkAvq/lAlv1ZMIuxUvyTMZYoA12SxIAuZuTfW22+
+        eZFDW1WHvt1D9Osh1KqQnLAyk5IOU28zbKYdtZUfp6dm55LImyqx3W43HteCtpmE
+        F9TzjMpk4QVPb4Rs6Giq1f0nkZdDhYtOWwDtvwIDAQABAoIBAGF/JziBUislaUAM
+        EuZto0m3kYarRlpXFUWb9e+4p6EN/iY6v4Rn3UYffUEVYsmyEF8CE+ivxJ8IsY2F
+        gfncHAKPv7EZf2GMvavasgCn1uqONnIsL5N8PseWBX1WXsi5MNt3rAd/ZiJ/8EH6
+        wZqw+2xAnNWpfZTVgyD2dfN46yhk3stMzYtnKzgOG+lx1SjoYnZ9OGc6oA8aPanL
+        Ku05FJwd3pT+/CfvJmOMxo/MEkBcX8zey75MbeauLx+d1VyUyVs4SXJPZm23R1Ks
+        xYFVcOuQWiopOUWhzQMhaU1d2tl0rJuXMUesM1VGbxM2LcGd0R0EYsOedJa7sLa4
+        nlclmzkCgYEA3Uw5kx7WNF7QIugxM8YjBaED/eYPwLS64cjFHeUvhFsHu3vR2q4X
+        DTn436EaUtXF3+Fw56fhirKtQElr+KE/JwCGW4A8x+NTs85P6prhIhXMlcJHhEAY
+        ib5MFKNwX3W57nYc3ksRlqxP7UPv9wxtOYMCMJ0PCbgeQKuZTd6dz0MCgYEAydoY
+        dnek0x7ms4FIKEuJFWCWMoc5qxjC3iiagyb/4WU0BXrnZ31XpUyz0KgoYuTRnxkh
+        p+xlv8gjBRTdDV7bMJh/XT3jsUnvBwq7U8Q1HYJQlWZBlXDO4UTdBGgojiuG+TvT
+        SzoDf1FXWXbcwQyjFzeHi8M1b7Yx05xlInv7adUCgYEAvhgEPQR4LHRlhha+bSL+
+        Yo91xlwhm/+jqN+1s4Bz2NX5RmuOULLKymnKBw90dUN8vlwBiH0FmQbzHA312ZVp
+        ki85OtBlZa8473OB4p04VvcyzlIc7NXCPlBhOjlLBjUyikybb7g8W5mY7s81Cpp6
+        GLUY5HmFuWuXUSYWgnWASdECgYEAp3B/MmZ1F5xeizEHBkYCZPVGIowBzmgv3dGY
+        uoqzX+lvicw2AKb8+WXzE3cqaT6elHdob7+td7UxN5ni9KBm+pzFqjcYlYxa92Bz
+        nDz6QoxDBGtao/h75GoXXPx6B9UblcuGrrRlCkwTRWdQH+O3th6eFdXMkep00rC9
+        RCnMmDECgYEAos12lBjLN1y1eDkhcr+QNI6P9HwHtZwCSwncpQkC1Mr+R71zxlry
+        YcabgnWyJZEEgCUQ/oxtfNHBbzunpfE0eeDYW5NW+eQRQwPsudUtm/yE3CoB21UE
+        W0XoM3R7ezXymicLlNOFYKbhAyFR+koQlc6OWsUpLiBRESD2W6j0qnQ=
+        -----END RSA PRIVATE KEY-----
+      agent:
+        domain: cf.internal
+        servers:
+          lan:
+          - 192.168.16.10
+    service-backup:
+      destinations: []
+      source_folder: "/var/vcap/store/redis-backup/"
+      source_executable: "/var/vcap/jobs/redis-backups/bin/backup --snapshot"
+      cleanup_executable: "/var/vcap/jobs/redis-backups/bin/backup --cleanup"
+      cron_schedule: 0 0 * * *
+      service_identifier_executable: "/var/vcap/jobs/redis-backups/bin/backup --identifier"
+    redis-backup:
+  env:
+    bosh:
+      password: "$6$56a66d5fc53ab3b1$ncn0djoMb0APMsV..obvpkHZK3ukmtnarSMBaL1yp/16FNNQFY6ABlo6fen0pEQXo/wb6aMoelA5ATYQ8jzcn1"
+  update:
+    max_in_flight: 1
+  networks:
+  - name: ert
+    default:
+    - dns
+    - gateway
+    static_ips:
+    - 192.168.16.60
+  migrated_from:
+  - name: cf-redis-broker-partition-19ef80700826a511fd03
+    az: us-central1-a
+  persistent_disk_type: '10240'
+  vm_extensions:
+  - vm-extension-cf-redis-broker-45b6261c05eed198ec18
+- name: dedicated-node
+  azs:
+  - us-central1-a
+  instances: 5
+  lifecycle: service
+  jobs:
+  - name: dedicated-node
+    release: cf-redis
+    consumes: {}
+    provides: {}
+  - name: syslog-configurator
+    release: cf-redis
+    consumes: {}
+    provides: {}
+  - name: redis-metrics
+    release: redis-metrics
+    consumes: {}
+    provides: {}
+  - name: service-metrics
+    release: service-metrics
+    consumes: {}
+    provides: {}
+  - name: metron_agent
+    release: loggregator
+    consumes: {}
+    provides: {}
+  - name: redis-backups
+    release: redis-backups
+    consumes: {}
+    provides: {}
+  - name: service-backup
+    release: service-backup
+    consumes: {}
+    provides: {}
+  - name: consul_agent
+    release: consul
+    consumes: {}
+    provides: {}
+  vm_type: micro.cpu
+  stemcell: bosh-google-kvm-ubuntu-trusty-go_agent
+  properties:
+    redis:
+      config_command: Arr1FJ6seB-Hdd4PUGNB8KmkvXwz6gsI
+      broker:
+        backend_host: 192.168.16.60
+        host: 192.168.16.60
+        auth:
+          username: admin
+          password: DGTOPBLoUs8AH52ECDl3Jcd035o_qos3
+    syslog_aggregator:
+      address:
+      port:
+      transport: TCP
+    service_metrics:
+      origin: p-redis
+      execution_interval_seconds: 30
+      deployment: cf-redis
+      dropsonde_incoming_port: 3457
+      metrics_command: "/var/vcap/packages/redis-metrics/bin/redis-metrics"
+      metrics_command_args:
+      - "-config=/var/vcap/store/redis/redis.conf"
+      monit_dependencies:
+      - redis
+    metron_agent:
+      deployment: cf-redis
+      etcd:
+        client_cert: |
+          -----BEGIN CERTIFICATE-----
+          MIIDWzCCAkOgAwIBAgIUe502gk2FjIZvl+6Auat4YcWEWtUwDQYJKoZIhvcNAQEL
+          BQAwHzELMAkGA1UEBhMCVVMxEDAOBgNVBAoMB1Bpdm90YWwwHhcNMTcwNDEyMTcy
+          NjA3WhcNMTkwNDEyMTcyNjA3WjA9MQswCQYDVQQGEwJVUzEQMA4GA1UECgwHUGl2
+          b3RhbDEcMBoGA1UEAwwTY2ZfZXRjZF9jbGllbnRfY2VydDCCASIwDQYJKoZIhvcN
+          AQEBBQADggEPADCCAQoCggEBANzYpRPGpxhmawcRBCeDfu5bbck4sy/8xFB7NZQJ
+          Or9fsFRMYWTvZEfdv/uhXzrzp0XkdKYoExzZvUlE0KDONp4qL4XUyd+SUeWKpZbJ
+          xGuWJ2LXWhB9ajAS4PUQ9B+gFp9yB05e47Rje+GpfWClt3j4pRWzAszTJit0mghd
+          Kx9wAonwOwEZj2wLjct81r0yJQ/A14pnYqq+4rlHbqvocx6UIMfhjsrnupiySpBN
+          6VwlW3+kJ5/4au31mve00/d5mTZQE055HNLiPFLhph461K5V3sXv69XBJjvM491L
+          0K19YbSDX0EnGzjIVyvsxUAd+YRt7RNShXg9o28gHeupMe0CAwEAAaNxMG8wDgYD
+          VR0PAQH/BAQDAgeAMB0GA1UdDgQWBBS6t0wlc72/5Mee7qMTPOvvG7CpGDAdBgNV
+          HSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwEwHwYDVR0jBBgwFoAUkPQxqmwtp0Z5
+          seEqZEapgXTh534wDQYJKoZIhvcNAQELBQADggEBALAmkg3LkfSKjf0ynhC2EfXk
+          u3GRXmTwrv2zkLTB+IWRMFqkldyP7ykHpcbq7MMNiLVX6sfDgNoOhwnV6Sp9ERsG
+          9REE4Lqir2NNyp7vD7NCBKu1rk2xNRjWOQFwlaz+uCrbEZBiuxMkEDPHjgopXhCf
+          zpStnIY7FKdWN8wQcnsTgZ0ZMxCScGRjH7Sn3+yso658E7uHQ/P3U3JJEsjdA7n1
+          jsJFsPwUqZNfZDw9jLOK6Mu8Pzl9cwHyuSfkA/w5GvNbx3GOh9vWj1L9Oes+JpVC
+          6QxsDDTqU66UYLDRbaXIRl9MLnXUaud7Fjycii1UQNeKRhVdXLzmWnoqy3aEK/c=
+          -----END CERTIFICATE-----
+        client_key: |
+          -----BEGIN RSA PRIVATE KEY-----
+          MIIEpQIBAAKCAQEA3NilE8anGGZrBxEEJ4N+7lttyTizL/zEUHs1lAk6v1+wVExh
+          ZO9kR92/+6FfOvOnReR0pigTHNm9SUTQoM42niovhdTJ35JR5YqllsnEa5YnYtda
+          EH1qMBLg9RD0H6AWn3IHTl7jtGN74al9YKW3ePilFbMCzNMmK3SaCF0rH3ACifA7
+          ARmPbAuNy3zWvTIlD8DXimdiqr7iuUduq+hzHpQgx+GOyue6mLJKkE3pXCVbf6Qn
+          n/hq7fWa97TT93mZNlATTnkc0uI8UuGmHjrUrlXexe/r1cEmO8zj3UvQrX1htINf
+          QScbOMhXK+zFQB35hG3tE1KFeD2jbyAd66kx7QIDAQABAoIBAQC2uiYz66z72ln5
+          2dF3JCzU6R84W8qfDOQdtyQInW5XQ8Qwq5X2HsD5WXfsqoOR0mH3yWPeys+tklc0
+          lVSNiLHWQg9aC0sQyg8q/oGt9rmnTvC9rnNdq3c92ZD6FBH5TMsLGB0FciuzaJDq
+          kQMlAViCJjDpeFj7wkUVtX9xJi107v0mUiJfc79YsxGbt3Q4mlc9wZ3pxMN7LMXv
+          OcXo0hxHdUL9/pi5hB8FYi1XhytvwY1BC4DO+8iZYqDOdXNDwEUY12ZxGsUZmfIJ
+          d2IS+wcYHjUZspvl+JOpGO63LHglFiZboCsN/Fbv41kZbHllzF9HkZKrPG44oroS
+          3ybkYtb9AoGBAP8tuH/LDU/HWTJgmtTmVCfH1eaSFODeNTMSaKkt1HQHQxNTI53w
+          Pd8HQq3ZHp8Uzsxgt2bvtHkSJFFhcLq+yNmrSFVloejA61mhUFm3XhnWOXXFctld
+          EqhAfwUBWzffhKFAHmv7rzsOEr7hBGz1RBze2rFVfzvmhFbisM4vbrLXAoGBAN2O
+          ofYmogtcMEVzjh5pNU00Fc9mwR2kS1M0L/a5yQ717APLpjuip0lxo35I8gGQqnPS
+          HTl/l9Xd3FV2+6VELJxk6im6GKj57Ku71EYRsshlzsfUazM5NF+7B1uHJgdI0AHA
+          uhFlUcgd23U69QWVKp2MyktIvz++j2CWMTPCqOzbAoGBANwgvdMH//C9YFXT/l0A
+          YMJ8YipoBDjDl5L6I20mCusYxKUsCEKb11PJOJ0t+ntzAL5QBIZ46++xVcEaVJvU
+          LwGO/3Qjm1tk6OHGBcGPLE8PfTv6W4vk/U5FbQ2NUPpPCGPuIxA16sD/7+3XwPCZ
+          V+ur1244+exbe/hTz//d7Rm7AoGADGZzQiefYitiuEBjb+hLh2qm3djObi5H2PxO
+          wuxbCG9TKlM3lpbf7ghiMis7AENshtb3s8QkZ1/neRETvIg4RviO8o7r2mlCicoV
+          c2aCLx0jmaOV7GQDPmhlXQYPZtD4c2CqCVc2YJDrO4B1Pj6/B9pdaCFGMvcjZzCA
+          yHjYo4kCgYEA6ezqGuN9LPgm+9INSnJxkR/yIxtISr3vXMW16rDMu1WWwfC18xaG
+          F75yalPTzoINgmtcOhhsfTryjp0G88FMSq+r6EOh7045qtRuKHZ3fdEuUy3AmFyy
+          +oSAa9GDqHEdSM68lN/e5eMiFy3xL7gqUbU4gnWHOOw9Bq+mgnb+F5o=
+          -----END RSA PRIVATE KEY-----
+    metron_endpoint:
+      shared_secret: mClA9S7AbLs6PxO-Aso5PHZcRQhoUuLP
+    loggregator:
+      etcd:
+        require_ssl: true
+        machines:
+        - cf-etcd.service.cf.internal
+        ca_cert: |
+          -----BEGIN CERTIFICATE-----
+          MIIDDjCCAfagAwIBAgIUFveV2Bc8af/2F8+9j/Gmf0A9N0swDQYJKoZIhvcNAQEL
+          BQAwHzELMAkGA1UEBhMCVVMxEDAOBgNVBAoMB1Bpdm90YWwwHhcNMTcwNDEyMTUz
+          MjIwWhcNMjEwNDEzMTUzMjIwWjAfMQswCQYDVQQGEwJVUzEQMA4GA1UECgwHUGl2
+          b3RhbDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALSt5KH6GkWhgfl6
+          gaDgEkmMOSsgXphVGFZh8ueFmDw93fsm+d+1VXTALfoDj5na8jhS6aV3AmEOEWyQ
+          wMHLyA4tniu16zY+nS4do+K3cNAwqVNnJwXBy9Cl8jR7fxq+pE8QFMjBw10V8DCz
+          7niEPjb+pOw+0rYtkRQ7YqZxu7RgrdK2x/LqpwPakQEZyhDXRQqrDyZYAUsbH5o4
+          cBUcq4ChQPDzKoywk3/obMOLuskzprLAHcAyLW4DPMXVRs3DgutWwYzFKNx8caOT
+          WB6FRaik0Ja2jTN6qIpxglEEpRcOjJaw+2cGGQj6zgQHCOPMMO6bSdPrRqLdEoVf
+          i1ed9vUCAwEAAaNCMEAwHQYDVR0OBBYEFJD0MapsLadGebHhKmRGqYF04ed+MA8G
+          A1UdEwEB/wQFMAMBAf8wDgYDVR0PAQH/BAQDAgEGMA0GCSqGSIb3DQEBCwUAA4IB
+          AQCHcTxgyHM6TMj9JYdmh38tpog0MJQ9LFhMBRuOLmvlkuC8lWW/NZRicuZ6ls1f
+          GKmn4GSxPCHEi0seku0NfFTr7JtC6I0BAo5+ZhLJJLmN8hlJLcTQxj1Yi+5nw8iD
+          UWz4EEuwT53XpP09mI72447xpQx7u7qyVYyu3MwR0ZxJg9cWxqE+AdZ88DQzPKnn
+          vMOYJcqXz0pYcSG38jIKpHbqQqDxIMXf37A9F1YDTD5IFxMtxUE2PY0faT2108Jp
+          8m4yZ15OGhj/bEUePORu0Kbs9oHX7d5MTo12CAIae/pi2Aozzxw8TBtxbrsiynIT
+          XnkzImlsdqbfr89AtGwFQudW
+          -----END CERTIFICATE-----
+    loggregator_endpoint:
+      shared_secret: mClA9S7AbLs6PxO-Aso5PHZcRQhoUuLP
+    consul:
+      encrypt_keys:
+      - gpr-Z0VRkXt5OyE31t0rRRYZ0_F09aK8
+      ca_cert: |
+        -----BEGIN CERTIFICATE-----
+        MIIDDjCCAfagAwIBAgIUFveV2Bc8af/2F8+9j/Gmf0A9N0swDQYJKoZIhvcNAQEL
+        BQAwHzELMAkGA1UEBhMCVVMxEDAOBgNVBAoMB1Bpdm90YWwwHhcNMTcwNDEyMTUz
+        MjIwWhcNMjEwNDEzMTUzMjIwWjAfMQswCQYDVQQGEwJVUzEQMA4GA1UECgwHUGl2
+        b3RhbDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALSt5KH6GkWhgfl6
+        gaDgEkmMOSsgXphVGFZh8ueFmDw93fsm+d+1VXTALfoDj5na8jhS6aV3AmEOEWyQ
+        wMHLyA4tniu16zY+nS4do+K3cNAwqVNnJwXBy9Cl8jR7fxq+pE8QFMjBw10V8DCz
+        7niEPjb+pOw+0rYtkRQ7YqZxu7RgrdK2x/LqpwPakQEZyhDXRQqrDyZYAUsbH5o4
+        cBUcq4ChQPDzKoywk3/obMOLuskzprLAHcAyLW4DPMXVRs3DgutWwYzFKNx8caOT
+        WB6FRaik0Ja2jTN6qIpxglEEpRcOjJaw+2cGGQj6zgQHCOPMMO6bSdPrRqLdEoVf
+        i1ed9vUCAwEAAaNCMEAwHQYDVR0OBBYEFJD0MapsLadGebHhKmRGqYF04ed+MA8G
+        A1UdEwEB/wQFMAMBAf8wDgYDVR0PAQH/BAQDAgEGMA0GCSqGSIb3DQEBCwUAA4IB
+        AQCHcTxgyHM6TMj9JYdmh38tpog0MJQ9LFhMBRuOLmvlkuC8lWW/NZRicuZ6ls1f
+        GKmn4GSxPCHEi0seku0NfFTr7JtC6I0BAo5+ZhLJJLmN8hlJLcTQxj1Yi+5nw8iD
+        UWz4EEuwT53XpP09mI72447xpQx7u7qyVYyu3MwR0ZxJg9cWxqE+AdZ88DQzPKnn
+        vMOYJcqXz0pYcSG38jIKpHbqQqDxIMXf37A9F1YDTD5IFxMtxUE2PY0faT2108Jp
+        8m4yZ15OGhj/bEUePORu0Kbs9oHX7d5MTo12CAIae/pi2Aozzxw8TBtxbrsiynIT
+        XnkzImlsdqbfr89AtGwFQudW
+        -----END CERTIFICATE-----
+      agent_cert: |
+        -----BEGIN CERTIFICATE-----
+        MIIDWTCCAkGgAwIBAgIUcx77L8ePtL1rtA7Iss5ItAgStkkwDQYJKoZIhvcNAQEL
+        BQAwHzELMAkGA1UEBhMCVVMxEDAOBgNVBAoMB1Bpdm90YWwwHhcNMTcwNDEyMTcy
+        NjA2WhcNMTkwNDEyMTcyNjA2WjA7MQswCQYDVQQGEwJVUzEQMA4GA1UECgwHUGl2
+        b3RhbDEaMBgGA1UEAwwRY29uc3VsX2FnZW50X2NlcnQwggEiMA0GCSqGSIb3DQEB
+        AQUAA4IBDwAwggEKAoIBAQCufWFDGHOwVCUzqkGUBbBJAUm8GI8oNvlJXTwK7IaZ
+        00RA9z0WbfNjaLZh/TBSW9xo6J8wMzXmBFo55GHlb2Yw1jeVaTWictPCOx014Lg9
+        uT67aqiTkBPTNTceapy3Ptach7Q2eBnoV+GIdmxMnEaIa7k2Rc5Pl5VkWgHfgykq
+        J6LGSmGeZjb1/PEvHoKSuKLDBHpoZn3GQC+r+UCW/Vkwi7FS/JMxligDXZLEgC5m
+        5N9bbb55kUNbVYe+3UP06yHUqpCcsDKTkg5TbzNsph21lR+np2bnksibKrHdbjce
+        14K2mYQX1POMymThBU9vhGzoaKrV/SeRl0OFi05bAO2/AgMBAAGjcTBvMA4GA1Ud
+        DwEB/wQEAwIHgDAdBgNVHQ4EFgQUfGKoOdeTfa7fn3F/eE3WBAJJu5QwHQYDVR0l
+        BBYwFAYIKwYBBQUHAwIGCCsGAQUFBwMBMB8GA1UdIwQYMBaAFJD0MapsLadGebHh
+        KmRGqYF04ed+MA0GCSqGSIb3DQEBCwUAA4IBAQCbw4SIlMdgKq6r1W1fnsOHGccd
+        c7nSmub61quIP6CTYw3U+vindogQ6t+W7O+cJYRFlVx+izlAmqOQd6YqjBxaCcgw
+        vZvghD34LDcedHF51S64dby364jO6ArqzDwxhrB92nMPzdvVx1UqZJ5h4M7PRego
+        6w39LeSujeTSrIThAYEPcANEBBmU9Orr2AvIPZ27DxUaKdgmTcvOd0NrtYO6G9pm
+        Y2VsshLN3dIo41T4Gdcb6ANzrcmtLypVvb9Wio5HgcXa9wUVhb5zTj1JU+MbjG5C
+        fmOasDIpTgTxgbmFfqDsbGYT28DefmVuuBz4S7Nv8LstobSMXcBnkl0mhlet
+        -----END CERTIFICATE-----
+      agent_key: |
+        -----BEGIN RSA PRIVATE KEY-----
+        MIIEpQIBAAKCAQEArn1hQxhzsFQlM6pBlAWwSQFJvBiPKDb5SV08CuyGmdNEQPc9
+        Fm3zY2i2Yf0wUlvcaOifMDM15gRaOeRh5W9mMNY3lWk1onLTwjsdNeC4Pbk+u2qo
+        k5AT0zU3Hmqctz7WnIe0NngZ6FfhiHZsTJxGiGu5NkXOT5eVZFoB34MpKieixkph
+        nmY29fzxLx6CkriiwwR6aGZ9xkAvq/lAlv1ZMIuxUvyTMZYoA12SxIAuZuTfW22+
+        eZFDW1WHvt1D9Osh1KqQnLAyk5IOU28zbKYdtZUfp6dm55LImyqx3W43HteCtpmE
+        F9TzjMpk4QVPb4Rs6Giq1f0nkZdDhYtOWwDtvwIDAQABAoIBAGF/JziBUislaUAM
+        EuZto0m3kYarRlpXFUWb9e+4p6EN/iY6v4Rn3UYffUEVYsmyEF8CE+ivxJ8IsY2F
+        gfncHAKPv7EZf2GMvavasgCn1uqONnIsL5N8PseWBX1WXsi5MNt3rAd/ZiJ/8EH6
+        wZqw+2xAnNWpfZTVgyD2dfN46yhk3stMzYtnKzgOG+lx1SjoYnZ9OGc6oA8aPanL
+        Ku05FJwd3pT+/CfvJmOMxo/MEkBcX8zey75MbeauLx+d1VyUyVs4SXJPZm23R1Ks
+        xYFVcOuQWiopOUWhzQMhaU1d2tl0rJuXMUesM1VGbxM2LcGd0R0EYsOedJa7sLa4
+        nlclmzkCgYEA3Uw5kx7WNF7QIugxM8YjBaED/eYPwLS64cjFHeUvhFsHu3vR2q4X
+        DTn436EaUtXF3+Fw56fhirKtQElr+KE/JwCGW4A8x+NTs85P6prhIhXMlcJHhEAY
+        ib5MFKNwX3W57nYc3ksRlqxP7UPv9wxtOYMCMJ0PCbgeQKuZTd6dz0MCgYEAydoY
+        dnek0x7ms4FIKEuJFWCWMoc5qxjC3iiagyb/4WU0BXrnZ31XpUyz0KgoYuTRnxkh
+        p+xlv8gjBRTdDV7bMJh/XT3jsUnvBwq7U8Q1HYJQlWZBlXDO4UTdBGgojiuG+TvT
+        SzoDf1FXWXbcwQyjFzeHi8M1b7Yx05xlInv7adUCgYEAvhgEPQR4LHRlhha+bSL+
+        Yo91xlwhm/+jqN+1s4Bz2NX5RmuOULLKymnKBw90dUN8vlwBiH0FmQbzHA312ZVp
+        ki85OtBlZa8473OB4p04VvcyzlIc7NXCPlBhOjlLBjUyikybb7g8W5mY7s81Cpp6
+        GLUY5HmFuWuXUSYWgnWASdECgYEAp3B/MmZ1F5xeizEHBkYCZPVGIowBzmgv3dGY
+        uoqzX+lvicw2AKb8+WXzE3cqaT6elHdob7+td7UxN5ni9KBm+pzFqjcYlYxa92Bz
+        nDz6QoxDBGtao/h75GoXXPx6B9UblcuGrrRlCkwTRWdQH+O3th6eFdXMkep00rC9
+        RCnMmDECgYEAos12lBjLN1y1eDkhcr+QNI6P9HwHtZwCSwncpQkC1Mr+R71zxlry
+        YcabgnWyJZEEgCUQ/oxtfNHBbzunpfE0eeDYW5NW+eQRQwPsudUtm/yE3CoB21UE
+        W0XoM3R7ezXymicLlNOFYKbhAyFR+koQlc6OWsUpLiBRESD2W6j0qnQ=
+        -----END RSA PRIVATE KEY-----
+      agent:
+        domain: cf.internal
+        servers:
+          lan:
+          - 192.168.16.10
+    service-backup:
+      destinations: []
+      source_folder: "/var/vcap/store/redis-backup/"
+      source_executable: "/var/vcap/jobs/redis-backups/bin/backup --snapshot"
+      cleanup_executable: "/var/vcap/jobs/redis-backups/bin/backup --cleanup"
+      cron_schedule: 0 0 * * *
+      service_identifier_executable: "/var/vcap/jobs/redis-backups/bin/backup --identifier"
+    redis-backup:
+  env:
+    bosh:
+      password: "$6$83c313dafead5b2f$BVT3/MJlO1qp.tOe.ujpzwHwwtuf0LaMNaQgktA7UN1PKcKkt1tfrjRz1JgFHjN9YeDh.dVBFi2ZQVI7k3lLu0"
+  update:
+    max_in_flight: 5
+  networks:
+  - name: ert
+    default:
+    - dns
+    - gateway
+    static_ips:
+    - 192.168.16.61
+    - 192.168.16.62
+    - 192.168.16.63
+    - 192.168.16.64
+    - 192.168.16.65
+  migrated_from:
+  - name: dedicated-node-partition-19ef80700826a511fd03
+    az: us-central1-a
+  persistent_disk_type: '5120'
+  vm_extensions:
+  - vm-extension-dedicated-node-1466db992e4d91a7f60a
+- name: broker-registrar
+  azs:
+  - us-central1-a
+  instances: 1
+  lifecycle: errand
+  jobs:
+  - name: broker-registrar
+    release: cf-redis
+    consumes: {}
+    provides: {}
+  vm_type: micro
+  stemcell: bosh-google-kvm-ubuntu-trusty-go_agent
+  properties:
+    broker:
+      name: p-redis
+      host: redis-broker.sys.pie-27.cfplatformeng.com
+      username: admin
+      password: DGTOPBLoUs8AH52ECDl3Jcd035o_qos3
+    cf:
+      api_url: https://api.sys.pie-27.cfplatformeng.com
+      skip_ssl_validation: true
+      admin_username: system_services
+      admin_password: NwIFEs7jBJNJZy_6G8b7dRZyMXPjWMDp
+  env:
+    bosh:
+      password: "$6$0e658e1a5491db1b$3YpbzcLPxun19bL.oYDcLtkuCy1h5hNVVIskvMOoLuJJyueQFmr6u7fkPWj9Ag6HOZAOb4MAnRg2arN1EuNsr0"
+  update:
+    max_in_flight: 1
+  networks:
+  - name: ert
+    default:
+    - dns
+    - gateway
+  vm_extensions:
+  - vm-extension-broker-registrar-f18b36a969f0e7490c63
+- name: broker-deregistrar
+  azs:
+  - us-central1-a
+  instances: 1
+  lifecycle: errand
+  jobs:
+  - name: broker-deregistrar
+    release: cf-redis
+    consumes: {}
+    provides: {}
+  vm_type: micro
+  stemcell: bosh-google-kvm-ubuntu-trusty-go_agent
+  properties:
+    broker:
+      name: p-redis
+      host: redis-broker.sys.pie-27.cfplatformeng.com
+      username: admin
+      password: DGTOPBLoUs8AH52ECDl3Jcd035o_qos3
+    cf:
+      api_url: https://api.sys.pie-27.cfplatformeng.com
+      skip_ssl_validation: true
+      admin_username: system_services
+      admin_password: NwIFEs7jBJNJZy_6G8b7dRZyMXPjWMDp
+  env:
+    bosh:
+      password: "$6$273acf20c09a5075$3z9qBt7aIYw8rlWgBG/n/ywhNw7rE8BbeTcZsLGoFMzQN5iztVmImjJ0dVWUQtmcDg/EOXWtjWw7efld8Yniq/"
+  update:
+    max_in_flight: 1
+  networks:
+  - name: ert
+    default:
+    - dns
+    - gateway
+  vm_extensions:
+  - vm-extension-broker-deregistrar-83764436b92cfa013039
+- name: smoke-tests
+  azs:
+  - us-central1-a
+  instances: 1
+  lifecycle: errand
+  jobs:
+  - name: smoke-tests
+    release: cf-redis
+    consumes: {}
+    provides: {}
+  vm_type: micro
+  stemcell: bosh-google-kvm-ubuntu-trusty-go_agent
+  properties:
+    redis:
+      broker:
+        service_instance_limit: 5
+        dedicated_nodes:
+        - 192.168.16.61
+        - 192.168.16.62
+        - 192.168.16.63
+        - 192.168.16.64
+        - 192.168.16.65
+        host: 192.168.16.60
+    cf:
+      api_url: https://api.sys.pie-27.cfplatformeng.com
+      apps_domain: cfapps.pie-27.cfplatformeng.com
+      system_domain: sys.pie-27.cfplatformeng.com
+      skip_ssl_validation: true
+      admin_username: admin
+      admin_password: e2oet1CnS2sngltKyiBl_FjMkIrfSqiq
+  env:
+    bosh:
+      password: "$6$2522094aca464135$EsmGW6b1kHcb7Xxk7Fzcqpi/i4nK6pW/nCnihRUkP7lzgSgEzddFyhR8t9WA6f2NiQdC6Dk6Sdkx2xBhVG740."
+  update:
+    max_in_flight: 1
+  networks:
+  - name: ert
+    default:
+    - dns
+    - gateway
+  vm_extensions:
+  - vm-extension-smoke-tests-15ecb81664626ae3092b
+update:
+  canaries: 1
+  canary_watch_time: 30000-300000
+  update_watch_time: 30000-300000
+  max_in_flight: 1
+  max_errors: 2
+  serial: true
+ubuntu@pie-27-ops-manager:~/activemq$

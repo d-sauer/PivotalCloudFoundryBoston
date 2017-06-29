@@ -1,0 +1,15 @@
+name: activemq-service
+version: 0+dev.3
+commit_hash: f336b5b
+uncommitted_changes: true
+jobs:
+- name: activemq_server
+  version: 88a845a9a814bfe4bafdc8c6efdef8f0a42e2439
+  fingerprint: 88a845a9a814bfe4bafdc8c6efdef8f0a42e2439
+  sha1: 20f037c35950956fb9b967b0e882ad89aec8cdde
+packages:
+- name: activemq_pkg
+  version: da238c33a98d7b3239f6b64b0318ee74800bc9b4
+  fingerprint: da238c33a98d7b3239f6b64b0318ee74800bc9b4
+  sha1: 7864f3d1fe97abb0e061d26d646b44760e72ac3b
+  dependencies: []
