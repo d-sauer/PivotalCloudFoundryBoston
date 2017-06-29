@@ -18,3 +18,4 @@ include 'services:webservice'
 rootProject.name = 'PivotalCloudFoundryBoston'
 
 include ':apps:commons', ':apps:demoA', ':apps:demoB'
+include ':service:route-service'

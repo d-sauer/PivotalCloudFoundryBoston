@@ -1,12 +1,12 @@
 package com.example.demoB;
 
-import com.example.commons.LoadCommonBeans;
+import com.example.commons.LoadCommonConfig;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-@LoadCommonBeans
+@LoadCommonConfig
 public class DemoBApplication {
 
 	public static void main(String[] args) {

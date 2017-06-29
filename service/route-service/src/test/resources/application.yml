@@ -1,0 +1,4 @@
+route-service:
+  redirect:
+    http://demo-a.local.pcfdev.io/: http://demo-b.local.pcfdev.io/
+    http://demo-b.local.pcfdev.io/: http://demo-a.local.pcfdev.io/

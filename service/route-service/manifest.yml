@@ -1,0 +1,10 @@
+---
+applications:
+- name: rerouting-service
+  memory: 800M
+  instances: 1
+  random-route: true
+  path: build/libs/route-service.jar
+  buildpack: https://github.com/cloudfoundry/java-buildpack.git
+env:
+  JBP_CONFIG_DEBUG: '{enabled: true}'
