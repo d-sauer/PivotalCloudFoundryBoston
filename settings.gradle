@@ -19,3 +19,4 @@ rootProject.name = 'PivotalCloudFoundryBoston'
 
 include ':apps:commons', ':apps:demoA', ':apps:demoB'
 include ':service:route-service'
+include ':service-broker:activemq-service-broker'
