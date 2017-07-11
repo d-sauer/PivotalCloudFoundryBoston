@@ -7,8 +7,8 @@ applications:
   buildpack: https://github.com/cloudfoundry/java-buildpack.git
 env:
  JBP_CONFIG_DEBUG: '{enabled: true}'
+services:
+ - registry-service
 
 # SIG_SECRET_KEY: JWTSecretKeyDontUseInProduction!
-#services:
-# - registry-service
 # - my-rabbit

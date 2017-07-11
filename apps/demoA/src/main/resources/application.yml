@@ -1,12 +1,10 @@
 spring:
-  application:
-    name: demoA
   zipkin:
     enabled: false
 
 management:
   security:
-    enabled: true
+    enabled: false # Only for DEMO purposes
 
 demo:
   listenerQueueName: demo-b-queue

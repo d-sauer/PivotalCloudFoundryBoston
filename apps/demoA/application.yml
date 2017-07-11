@@ -2,7 +2,7 @@
 server:
   port: 8081
 
-
 demo:
   listenerQueueName: demo-a-queue
   sendQueueName: demo-b-queue
+

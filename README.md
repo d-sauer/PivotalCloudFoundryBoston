@@ -62,3 +62,31 @@ Tile Generator installation: http://docs.pivotal.io/tiledev/tile-generator.html#
 For debugging we need to open SSH tunnel (5005 - port on localhost machine to connect remote debugger, Debug 8000 port on PCF):
 
     cf ssh -N -T -L 5005:localhost:8000 <APP_NAME>
+    
+    
+# Spring Cloud Services
+
+## Create Spring Cloud Registry
+
+    cf create-service p-service-registry standard registry-service
+    
+Documentation
+ 
+  - [Service Registry for Pivotal Cloud Foundry](https://docs.pivotal.io/spring-cloud-services/1-4/common/service-registry/)
+  - [Spring Cloud Netflix](https://cloud.spring.io/spring-cloud-netflix/spring-cloud-netflix.html)
+    
+
+> **@EnableDiscoveryClient vs @EnableEurekaClient**
+    `@EnableDiscoveryClient` support multiple implementations of "Discovery Client".
+    And if Spring Cloud Netflix is on the classpath, then that one will be used.
+    This annotation have same effect as `@EnableEurekaClient`, only difference is that
+    with `@EnableEurekaClient` we are forcing to use strictly Netflix Eureka.
+
+    
+## Create Spring Cloud Config Service
+
+    cf create-service p-config-server standard config-service
+    
+Documentation
+ 
+ - [Spring Cloud Config](https://cloud.spring.io/spring-cloud-config/spring-cloud-config.html)

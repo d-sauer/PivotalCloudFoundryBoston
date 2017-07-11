@@ -39,15 +39,17 @@ dependencies {
 
 	compile('org.springframework.boot:spring-boot-starter-activemq')
 
-	compile('org.springframework.boot:spring-boot-starter-cloud-connectors')
+	// Discovery (Eureka)
 	compile('org.springframework.cloud:spring-cloud-starter-eureka')
-	compile('org.springframework.cloud:spring-cloud-starter-hystrix')
-	compile('org.springframework.cloud:spring-cloud-starter-ribbon')
-	compile('org.springframework.boot:spring-boot-starter-data-jpa')
-	compile('org.springframework.boot:spring-boot-starter-data-redis')
-	compile('io.pivotal.spring.cloud:spring-cloud-services-starter-circuit-breaker')
-	compile('io.pivotal.spring.cloud:spring-cloud-services-starter-config-client')
 	compile('io.pivotal.spring.cloud:spring-cloud-services-starter-service-registry')
+
+//	compile('org.springframework.boot:spring-boot-starter-cloud-connectors')
+//	compile('org.springframework.cloud:spring-cloud-starter-hystrix')
+//	compile('org.springframework.cloud:spring-cloud-starter-ribbon')
+//	compile('org.springframework.boot:spring-boot-starter-data-jpa')
+//	compile('org.springframework.boot:spring-boot-starter-data-redis')
+//	compile('io.pivotal.spring.cloud:spring-cloud-services-starter-circuit-breaker')
+//	compile('io.pivotal.spring.cloud:spring-cloud-services-starter-config-client')
 
 	runtime('com.h2database:h2')
 

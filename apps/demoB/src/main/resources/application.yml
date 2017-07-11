@@ -1,12 +1,10 @@
 spring:
-  application:
-    name: demoB
   zipkin:
     enabled: false
 
 management:
   security:
-    enabled: false
+    enabled: false # Only for DEMO purposes
 
 
 demo:
